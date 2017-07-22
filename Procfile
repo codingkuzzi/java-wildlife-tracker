@@ -1,0 +1,1 @@
+web: ./build/install/java-wildlife-tracker/bin/java-wildlife-tracker
