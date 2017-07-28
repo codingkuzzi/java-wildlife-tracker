@@ -1,0 +1,21 @@
+<h3>Animals:</h3>
+
+#if ($animals.size() > 0)
+    <ul>
+    #foreach ($animal in $animals)
+        <li><a href="/animals/$animal.getId()">$animal.getDisplayName()</a></li>
+    #end
+    </ul>
+#else <p>No animals</p>#end
+
+<h3>Endangered animals:</h3>
+
+#if ($endangeredAnimals.size() > 0)
+    <ul>
+    #foreach ($animal in $endangeredAnimals)
+        <li><a href="/animals/$animal.getId()">$animal.getDisplayName()</a></li>
+    #end
+    </ul>
+#else <p>No endangered animals</p>#end
+<br>
+<a href="/animals/new">Add new animal</a>

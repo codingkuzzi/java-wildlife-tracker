@@ -1,0 +1,11 @@
+<h3>Rangers:</h3>
+
+#if ($rangers.size() > 0)
+    <ul>
+    #foreach($ranger in $rangers)
+        <li><a href="/rangers/$ranger.getId()">$ranger.getDisplayName() at $stationsDict.get($ranger.getStation_Id())</a></li>
+    #end
+    </ul>
+#else <p>No rangers</p>#end
+
+<a href="/rangers/new">Add new ranger</a>

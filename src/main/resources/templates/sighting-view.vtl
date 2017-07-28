@@ -1,0 +1,12 @@
+<h3>Sighting:</h3>
+
+<p>Station: $station.getName()</p>
+<p>Location: $location.getName()</p>
+<p>Animal: $animal.getDisplayName()</p>
+<p>Ranger: $ranger.getDisplayName()</p>
+<p>Time: $displayTime</p>
+#if ($imageUrl)
+<img src="$imageUrl" alt="$animal.getName()" />
+#end
+<br>
+<a href="/sightings">Back to sightings list</a>

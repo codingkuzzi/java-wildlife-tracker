@@ -1,125 +1,55 @@
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 
-import org.sql2o.Sql2o;
-import spark.ModelAndView;
+import db.LocalDateTimeConverter;
+import org.sql2o.converters.Convert;
+import routes.*;
 import spark.Spark;
 import spark.template.velocity.VelocityTemplateEngine;
-import static spark.Spark.*;
 
 public class App {
   public static void main(String[] args) {
+
+    Spark.staticFileLocation("/public");
+
+    // FIX: out of the box sql2o can't convert to and from LocalDateTime
+    Convert.registerConverter(LocalDateTime.class, new LocalDateTimeConverter());
+
     // Use Heroku environment variables, if detected
     if (System.getenv("PORT") != null) {
       Spark.port(Integer.parseInt(System.getenv("PORT")));
     }
 
-    if (System.getenv("JDBC_DATABASE_URL") != null) {
-      DB.sql2o  = new Sql2o(
-              System.getenv("JDBC_DATABASE_URL"),
-              System.getenv("JDBC_DATABASE_USERNAME"),
-              System.getenv("JDBC_DATABASE_PASSWORD"));
-    } else {
-      DB.sql2o  = new Sql2o(
-              "jdbc:postgresql://localhost:5432/wildlife_tracker",
-              "postgres",
-              "postgres");
-    }
+    Spark.get("/", new IndexGetRoute(), new VelocityTemplateEngine());
 
-    staticFileLocation("/public");
-    String layout = "templates/layout.vtl";
+    Spark.get("/logon", new LogonGetRoute(), new VelocityTemplateEngine());
+    Spark.post("/logon", new LogonPostRoute(), new VelocityTemplateEngine());
+    Spark.get("/logoff", new LogoffGetRoute(), new VelocityTemplateEngine());
 
-    get("/", (request, response) -> {
-      Map<String, Object> model = new HashMap<String, Object>();
-      model.put("animals", Animal.all());
-      model.put("endangeredAnimals", EndangeredAnimal.all());
-      model.put("sightings", Sighting.all());
-      model.put("template", "templates/index.vtl");
-      return new ModelAndView(model, layout);
-    }, new VelocityTemplateEngine());
+    Spark.get("/stations", new StationsGetRoute(), new VelocityTemplateEngine());
+    Spark.get("/stations/new", new StationNewGetRoute(), new VelocityTemplateEngine());
+    Spark.post("/stations/new", new StationNewPostRoute(), new VelocityTemplateEngine());
+    Spark.get("/stations/:id", new StationViewGetRoute(), new VelocityTemplateEngine());
 
-    post("/endangered_sighting", (request, response) -> {
-      Map<String, Object> model = new HashMap<String, Object>();
-      String rangerName = request.queryParams("rangerName");
-      int animalIdSelected = Integer.parseInt(request.queryParams("endangeredAnimalSelected"));
-      String latLong = request.queryParams("latLong");
-      Sighting sighting = new Sighting(animalIdSelected, latLong, rangerName);
-      sighting.save();
-      model.put("sighting", sighting);
-      model.put("animals", EndangeredAnimal.all());
-      String animal = EndangeredAnimal.find(animalIdSelected).getName();
-      model.put("animal", animal);
-      model.put("template", "templates/success.vtl");
-      return new ModelAndView(model, layout);
-    }, new VelocityTemplateEngine());
+    Spark.get("/rangers", new RangersGetRoute(), new VelocityTemplateEngine());
+    Spark.get("/rangers/new", new RangerNewGetRoute(), new VelocityTemplateEngine());
+    Spark.post("/rangers/new", new RangerNewPostRoute(), new VelocityTemplateEngine());
+    Spark.get("/rangers/:id", new RangerViewGetRoute(), new VelocityTemplateEngine());
 
-    post("/sighting", (request, response) -> {
-      Map<String, Object> model = new HashMap<String, Object>();
-      String rangerName = request.queryParams("rangerName");
-      int animalIdSelected = Integer.parseInt(request.queryParams("animalSelected"));
-      String latLong = request.queryParams("latLong");
-      Sighting sighting = new Sighting(animalIdSelected, latLong, rangerName);
-      sighting.save();
-      model.put("sighting", sighting);
-      model.put("animals", Animal.all());
-      String animal = Animal.find(animalIdSelected).getName();
-      model.put("animal", animal);
-      model.put("template", "templates/success.vtl");
-      return new ModelAndView(model, layout);
-    }, new VelocityTemplateEngine());
+    Spark.get("/locations", new LocationsGetRoute(), new VelocityTemplateEngine());
+    Spark.get("/locations/new", new LocationNewGetRoute(), new VelocityTemplateEngine());
+    Spark.post("/locations/new", new LocationNewPostRoute(), new VelocityTemplateEngine());
+    Spark.get("/locations/:id", new LocationViewGetRoute(), new VelocityTemplateEngine());
 
-    get("/animal/new", (request, response) -> {
-      Map<String, Object> model = new HashMap<String, Object>();
-      model.put("animals", Animal.all());
-      model.put("endangeredAnimals", EndangeredAnimal.all());
-      model.put("template", "templates/animal-form.vtl");
-      return new ModelAndView(model, layout);
-    }, new VelocityTemplateEngine());
+    Spark.get("/animals", new AnimalsGetRoute(), new VelocityTemplateEngine());
+    Spark.get("/animals/new", new AnimalNewGetRoute(), new VelocityTemplateEngine());
+    Spark.post("/animals/new", new AnimalNewPostRoute(), new VelocityTemplateEngine());
+    Spark.get("/animals/:id", new AnimalViewGetRoute(), new VelocityTemplateEngine());
 
-    post("/animal/new", (request, response) -> {
-      Map<String, Object> model = new HashMap<String, Object>();
-      boolean endangered = request.queryParamsValues("endangered")!=null;
-      if (endangered) {
-        String name = request.queryParams("name");
-        String health = request.queryParams("health");
-        String age = request.queryParams("age");
-        EndangeredAnimal endangeredAnimal = new EndangeredAnimal(name, health, age);
-        endangeredAnimal.save();
-        model.put("animals", Animal.all());
-        model.put("endangeredAnimals", EndangeredAnimal.all());
-      } else {
-        String name = request.queryParams("name");
-        Animal animal = new Animal(name);
-        animal.save();
-        model.put("animals", Animal.all());
-        model.put("endangeredAnimals", EndangeredAnimal.all());
-      }
-      response.redirect("/");
-        return null;
-      });
+    Spark.get("/sightings", new SightingsGetRoute(), new VelocityTemplateEngine());
+    Spark.get("/sightings/new", new SightingNewGetRoute(), new VelocityTemplateEngine());
+    Spark.post("/sightings/new", new SightingNewPostRoute(), new VelocityTemplateEngine());
+    Spark.get("/sightings/:id", new SightingViewGetRoute(), new VelocityTemplateEngine());
 
-    get("/animal/:id", (request, response) -> {
-      Map<String, Object> model = new HashMap<String, Object>();
-      Animal animal = Animal.find(Integer.parseInt(request.params("id")));
-      model.put("animal", animal);
-      model.put("template", "templates/animal.vtl");
-      return new ModelAndView(model, layout);
-    }, new VelocityTemplateEngine());
-
-    get("/endangered_animal/:id", (request, response) -> {
-      Map<String, Object> model = new HashMap<String, Object>();
-      EndangeredAnimal endangeredAnimal = EndangeredAnimal.find(Integer.parseInt(request.params("id")));
-      model.put("endangeredAnimal", endangeredAnimal);
-      model.put("template", "templates/endangered_animal.vtl");
-      return new ModelAndView(model, layout);
-    }, new VelocityTemplateEngine());
-
-    get("/error", (request, response) -> {
-      Map<String, Object> model = new HashMap<String, Object>();
-      model.put("template", "templates/error.vtl");
-      return new ModelAndView(model, layout);
-    }, new VelocityTemplateEngine());
+    Spark.get("/error/:id", new ErrorGetRoute(), new VelocityTemplateEngine());
   }
 }

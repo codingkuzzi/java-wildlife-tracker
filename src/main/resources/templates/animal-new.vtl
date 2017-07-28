@@ -1,0 +1,53 @@
+<h3>Add a new animal to a list:</h3>
+
+<form action="/animals/new" method="post">
+    <div class="form-group row">
+        <label for="name" class="col-md-2 col-form-label">Name</label>
+        <div class="col-md-10">
+            <input id="name" name="name" type="text" class="form-control" required>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="is_endangered" class="col-md-2 col-form-label">Endangered?</label>
+        <div class="col-md-10">
+            <div class="form-check">
+                <input id="is_endangered" name="is_endangered" type="checkbox" class="form-check-input">
+            </div>
+        </div>
+    </div>
+    <div id="healthRow" style="display:none;" class="form-group row">
+        <label for="health" class="col-md-2 col-form-label">Health</label>
+        <div class="col-md-10">
+            <select id="health" name="health" class="form-control">
+            #foreach($healthOption in $healthOptions)
+                <option value="$healthOption.ordinal()">$healthOption.name()</option>
+            #end
+            </select>
+        </div>
+    </div>
+    <div id="ageRow" style="display:none;" class="form-group row">
+        <label for="age" class="col-md-2 col-form-label">Age</label>
+        <div class="col-md-10">
+            <select id="age" name="age" class="form-control">
+            #foreach($ageOption in $ageOptions)
+                <option value="$ageOption.ordinal()">$ageOption.name()</option>
+            #end
+            </select>
+        </div>
+    </div>
+    <br>
+    <button type="submit" class="btn btn-default">Add</button>
+</form>
+
+<script>
+document.getElementById("is_endangered").onclick = function() {
+  if (document.getElementById("is_endangered").checked) {
+    document.getElementById("healthRow").style.display = null;
+    document.getElementById("ageRow").style.display = null;
+  }
+  else {
+    document.getElementById("healthRow").style.display = "none";
+    document.getElementById("ageRow").style.display = "none";
+  }
+}
+</script>

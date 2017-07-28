@@ -1,0 +1,35 @@
+<h3>Station: $station.getName()</h3>
+
+<h3>Rangers:</h3>
+#if ($rangers.size() > 0)
+<ul>
+    #foreach($ranger in $rangers)
+        <li><a href="/rangers/$ranger.getId()">$ranger.getDisplayName()</a></li>
+    #end
+</ul>
+#else <p>No rangers</p>#end
+<a href="/rangers/new?stationId=$station.getId()">Add ranger</a>
+<br>
+
+<h3>Locations:</h3>
+#if ($locations.size() > 0)
+<ul>
+    #foreach($location in $locations)
+        <li><a href="/locations/$location.getId()">$location.getName()</a></li>
+    #end
+</ul>
+#else <p>No locations</p>#end
+<a href="/locations/new?stationId=$station.getId()">Add location</a>
+<br>
+
+<h3>Sightings:</h3>
+#if ($sightings.size() > 0)
+<ul>
+    #foreach($s in $sightings)
+        <li><a href="/sightings/$s.getId()">$animalsDict.get($s.getAnimal_Id()) at $locationsDict.get($s.getLocation_Id()) by $rangersDict.get($s.getRanger_Id()) on $s.getDisplayTime()</a></li>
+    #end
+</ul>
+#else <p>No sightings</p>#end
+<br>
+
+<a href="/stations">Back to stations list</a>

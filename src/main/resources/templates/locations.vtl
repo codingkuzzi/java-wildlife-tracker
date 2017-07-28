@@ -1,0 +1,11 @@
+<h3>Locations:</h3>
+
+#if ($locations.size() > 0)
+    <ul>
+    #foreach($location in $locations)
+        <li><a href="/locations/$location.getId()">$location.getName() at $stationsDict.get($location.getStation_Id())</a></li>
+    #end
+    </ul>
+#else <p>No locations</p>#end
+
+<a href="/locations/new">Add new location</a>

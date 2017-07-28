@@ -1,0 +1,11 @@
+<h3>Stations:</h3>
+
+#if ($stations.size() > 0)
+    <ul>
+    #foreach($station in $stations)
+        <li><a href="/stations/$station.getId()">$station.getName()</a></li>
+    #end
+    </ul>
+#else <p>No stations</p>#end
+
+<a href="/stations/new">Add new station</a>

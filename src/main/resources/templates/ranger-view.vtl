@@ -1,0 +1,17 @@
+<h3>Ranger: $ranger.getDisplayName()</h3>
+
+<p>Station: $station.getName()</p>
+<p>Email: $ranger.getEmail()</p>
+<br>
+
+<h3>Sightings:</h3>
+#if ($sightings.size() > 0)
+<ul>
+    #foreach($s in $sightings)
+        <li><a href="/sightings/$s.getId()">$animalsDict.get($s.getAnimal_Id()) at $locationsDict.get($s.getLocation_Id()) on $s.getDisplayTime()</a></li>
+    #end
+</ul>
+#else <p>No sightings</p>#end
+<br>
+
+<a href="/rangers">Back to rangers list</a>
