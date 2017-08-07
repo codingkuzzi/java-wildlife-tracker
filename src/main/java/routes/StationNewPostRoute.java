@@ -1,17 +1,15 @@
 package routes;
 
 import db.Repository;
-import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
-import spark.TemplateViewRoute;
 
-public class StationNewPostRoute implements TemplateViewRoute{
+import java.util.Map;
+
+public class StationNewPostRoute extends BaseRoute {
     @Override
-    public ModelAndView handle(Request request, Response response) throws Exception {
-        Repository db = new Repository();
+    protected void process(Request request, Response response, Map<String, Object> model, Repository db) {
         db.addStation(request.queryParams("name"));
         response.redirect("/stations");
-        return new ModelAndView(null, null);
     }
 }

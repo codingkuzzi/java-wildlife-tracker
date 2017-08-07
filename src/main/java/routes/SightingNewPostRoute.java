@@ -1,17 +1,14 @@
 package routes;
 
 import db.Repository;
-import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
-import spark.TemplateViewRoute;
-
 import java.time.LocalDateTime;
+import java.util.Map;
 
-public class SightingNewPostRoute implements TemplateViewRoute{
+public class SightingNewPostRoute extends BaseRoute {
   @Override
-  public ModelAndView handle(Request request, Response response) throws Exception {
-    Repository db = new Repository();
+  protected void process(Request request, Response response, Map<String, Object> model, Repository db) {
     db.addSighting(
       Integer.parseInt(request.queryParams("animal")),
       Integer.parseInt(request.queryParams("ranger")),
@@ -20,6 +17,5 @@ public class SightingNewPostRoute implements TemplateViewRoute{
       request.queryParams("image")
     );
     response.redirect("/sightings/new");
-    return new ModelAndView(null, null);
   }
 }

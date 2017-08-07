@@ -2,20 +2,18 @@ package routes;
 
 import db.Repository;
 import model.Ranger;
-import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
-import spark.TemplateViewRoute;
 
-public class LogonPostRoute implements TemplateViewRoute {
+import java.util.Map;
+
+public class LogonPostRoute extends BaseRoute {
   @Override
-  public ModelAndView handle(Request request, Response response) throws Exception {
+  protected void process(Request request, Response response, Map<String, Object> model, Repository db) {
     int userId = Integer.parseInt(request.queryParams("ranger"));
-    Repository db = new Repository();
     Ranger user = db.getRangerById(userId);
     request.session().attribute("userId", user.getId());
     request.session().attribute("userName", user.getDisplayName());
     response.redirect("/");
-    return new ModelAndView(null, null);
   }
 }

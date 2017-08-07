@@ -5,6 +5,7 @@ import model.enums.AnimalAge;
 import model.enums.AnimalHealth;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
+import org.sql2o.converters.Convert;
 import org.sql2o.data.Row;
 
 import java.time.LocalDateTime;
@@ -14,19 +15,14 @@ import java.util.List;
 public class Repository {
   private Sql2o sqlHelper;
 
-  public Repository() {
-    if (System.getenv("JDBC_DATABASE_URL") != null) {
-      sqlHelper = new Sql2o(
-        System.getenv("JDBC_DATABASE_URL"),
-        System.getenv("JDBC_DATABASE_USERNAME"),
-        System.getenv("JDBC_DATABASE_PASSWORD"));
-    } else {
-      // TODO: move db settings to config file
-      sqlHelper = new Sql2o(
-        "jdbc:postgresql://localhost:5432/wildlife_tracker_2",
-        null,
-        null);
-    }
+  public Repository(String url) {
+    this(url, null, null);
+  }
+
+  public Repository(String url, String user, String password) {
+    // FIX: out of the box sql2o can't convert to and from LocalDateTime
+    Convert.registerConverter(LocalDateTime.class, new LocalDateTimeConverter());
+    sqlHelper = new Sql2o(url, user, password);
   }
 
   // region Animal
@@ -102,26 +98,29 @@ public class Repository {
     }
   }
 
-  public void addNonEndangeredAnimal(String name) {
+  public int addNonEndangeredAnimal(String name) {
     try (Connection connection = sqlHelper.open()) {
-      connection
-        .createQuery("INSERT INTO animals(name,is_endangered) VALUES (:name,:is_endangered)")
+      return connection
+        .createQuery("INSERT INTO animals(name,is_endangered) VALUES (:name,:is_endangered)", true)
         .addParameter("name", name)
         .addParameter("is_endangered", false)
-        .executeUpdate();
+        .executeUpdate()
+        .getKey(int.class);
     }
+
   }
 
-  public void addEndangeredAnimal(String name, AnimalHealth health, AnimalAge age) {
+  public int addEndangeredAnimal(String name, AnimalHealth health, AnimalAge age) {
     try (Connection connection = sqlHelper.open()) {
-      connection
-        .createQuery("INSERT INTO animals(name,is_endangered,health,age) VALUES (:name,:is_endangered,:health,:age)")
+      return connection
+        .createQuery("INSERT INTO animals(name,is_endangered,health,age) VALUES (:name,:is_endangered,:health,:age)", true)
         .addParameter("name", name)
         .addParameter("is_endangered", true)
         // sql2o can auto-convert enum to String and vice versa
         .addParameter("health", health)
         .addParameter("age", age)
-        .executeUpdate();
+        .executeUpdate()
+        .getKey(int.class);
     }
   }
   // endregion
@@ -154,13 +153,14 @@ public class Repository {
     }
   }
 
-  public void addLocation(String name, int stationId) {
+  public int addLocation(String name, int stationId) {
     try (Connection connection = sqlHelper.open()) {
-      connection
-        .createQuery("INSERT INTO locations(name,station_id) VALUES (:name,:stationId)")
+      return connection
+        .createQuery("INSERT INTO locations(name,station_id) VALUES (:name,:stationId)", true)
         .addParameter("name", name)
         .addParameter("stationId", stationId)
-        .executeUpdate();
+        .executeUpdate()
+        .getKey(int.class);
     }
   }
   // endregion
@@ -194,15 +194,16 @@ public class Repository {
     }
   }
 
-  public void addRanger(int stationId, String lastName, String firstName, String email) {
+  public int addRanger(int stationId, String lastName, String firstName, String email) {
     try (Connection connection = sqlHelper.open()) {
-      connection
-        .createQuery("INSERT INTO rangers(lastname,firstname,email,station_id) VALUES (:lastName,:firstName,:email,:stationId)")
+      return connection
+        .createQuery("INSERT INTO rangers(lastname,firstname,email,station_id) VALUES (:lastName,:firstName,:email,:stationId)", true)
         .addParameter("lastName", lastName)
         .addParameter("firstName", firstName)
         .addParameter("email", email)
         .addParameter("stationId", stationId)
-        .executeUpdate();
+        .executeUpdate()
+        .getKey(int.class);
     }
   }
   // endregion
@@ -262,16 +263,17 @@ public class Repository {
     }
   }
 
-  public void addSighting(int animalId, int rangerId, int locationId, LocalDateTime time, String image) {
+  public int addSighting(int animalId, int rangerId, int locationId, LocalDateTime time, String image) {
     try (Connection connection = sqlHelper.open()) {
-      connection
-        .createQuery("INSERT INTO sightings(animal_id,ranger_id,location_id,time,image) VALUES (:animalId,:rangerId,:locationId,:time,:image)")
+      return connection
+        .createQuery("INSERT INTO sightings(animal_id,ranger_id,location_id,time,image) VALUES (:animalId,:rangerId,:locationId,:time,:image)", true)
         .addParameter("animalId", animalId)
         .addParameter("rangerId", rangerId)
         .addParameter("locationId", locationId)
         .addParameter("time", time)
         .addParameter("image", image)
-        .executeUpdate();
+        .executeUpdate()
+        .getKey(int.class);
     }
   }
   // endregion
@@ -295,14 +297,52 @@ public class Repository {
     }
   }
 
-  public void addStation(String name) {
+  public int addStation(String name) {
     try (Connection connection = sqlHelper.open()) {
-      connection
-        .createQuery("INSERT INTO stations(name) VALUES (:name)")
+      return connection
+        .createQuery("INSERT INTO stations(name) VALUES (:name)", true)
         .addParameter("name", name)
-        .executeUpdate();
+        .executeUpdate()
+        .getKey(int.class);
     }
   }
   // endregion
 
+  // region Deletions
+  public void deleteAnimals() {
+    try (Connection connection = sqlHelper.open()) {
+      connection
+        .createQuery("DELETE FROM animals")
+        .executeUpdate();
+    }
+  }
+  public void deleteLocations() {
+    try (Connection connection = sqlHelper.open()) {
+      connection
+        .createQuery("DELETE FROM locations")
+        .executeUpdate();
+    }
+  }
+  public void deleteRangers() {
+    try (Connection connection = sqlHelper.open()) {
+      connection
+        .createQuery("DELETE FROM rangers")
+        .executeUpdate();
+    }
+  }
+  public void deleteSightings() {
+    try (Connection connection = sqlHelper.open()) {
+      connection
+        .createQuery("DELETE FROM sightings")
+        .executeUpdate();
+    }
+  }
+  public void deleteStations() {
+    try (Connection connection = sqlHelper.open()) {
+      connection
+        .createQuery("DELETE FROM stations")
+        .executeUpdate();
+    }
+  }
+  // endregion
 }

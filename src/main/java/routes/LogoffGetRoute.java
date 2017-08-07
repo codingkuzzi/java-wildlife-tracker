@@ -1,16 +1,16 @@
 package routes;
 
-import spark.ModelAndView;
+import db.Repository;
 import spark.Request;
 import spark.Response;
-import spark.TemplateViewRoute;
 
-public class LogoffGetRoute implements TemplateViewRoute {
+import java.util.Map;
+
+public class LogoffGetRoute extends BaseRoute {
   @Override
-  public ModelAndView handle(Request request, Response response) throws Exception {
+  protected void process(Request request, Response response, Map<String, Object> model, Repository db) {
     request.session().attribute("userId", null);
     request.session().attribute("userName", null);
     response.redirect(request.headers("Referer"));
-    return new ModelAndView(null, null);
   }
 }

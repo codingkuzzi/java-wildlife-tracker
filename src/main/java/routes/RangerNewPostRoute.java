@@ -1,15 +1,13 @@
 package routes;
 
 import db.Repository;
-import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
-import spark.TemplateViewRoute;
+import java.util.Map;
 
-public class RangerNewPostRoute implements TemplateViewRoute{
+public class RangerNewPostRoute extends BaseRoute {
   @Override
-  public ModelAndView handle(Request request, Response response) throws Exception {
-    Repository db = new Repository();
+  protected void process(Request request, Response response, Map<String, Object> model, Repository db) {
     db.addRanger(
       Integer.parseInt(request.queryParams("station")),
       request.queryParams("firstName"),
@@ -17,6 +15,5 @@ public class RangerNewPostRoute implements TemplateViewRoute{
       request.queryParams("email")
     );
     response.redirect("/rangers");
-    return new ModelAndView(null, null);
   }
 }

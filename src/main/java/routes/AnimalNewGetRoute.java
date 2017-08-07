@@ -1,23 +1,17 @@
 package routes;
 
+import db.Repository;
 import model.enums.AnimalAge;
 import model.enums.AnimalHealth;
-import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
-import spark.TemplateViewRoute;
-
-import java.util.HashMap;
 import java.util.Map;
 
-public class AnimalNewGetRoute implements TemplateViewRoute {
+public class AnimalNewGetRoute extends BaseRoute {
   @Override
-  public ModelAndView handle(Request request, Response response) throws Exception {
-    Map<String, Object> model = new HashMap<>();
-    model.put("userName", request.session().attribute("userName"));
+  protected void process(Request request, Response response, Map<String, Object> model, Repository db) {
     model.put("healthOptions", AnimalHealth.values());
     model.put("ageOptions", AnimalAge.values());
     model.put("template", "/templates/animal-new.vtl");
-    return new ModelAndView(model, "templates/layout.vtl");
   }
 }

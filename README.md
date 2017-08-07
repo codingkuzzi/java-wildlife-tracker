@@ -32,7 +32,7 @@ To create the necessary databases, launch postgres, then psql, and run the follo
 * _Navigate to the project folder._ 
 * _Create database tables with script media.sql._
 * _On the terminal, type "gradlew run", then enter the following in the browser's URL bar: http://localhost:4567/._
-
+* _Create database "wildlife_tracker_2_test" with template wildlife_tracker_2._
 
 
 ### License

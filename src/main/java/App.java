@@ -11,10 +11,6 @@ public class App {
 
     Spark.staticFileLocation("/public");
 
-    // FIX: out of the box sql2o can't convert to and from LocalDateTime
-    Convert.registerConverter(LocalDateTime.class, new LocalDateTimeConverter());
-
-    // Use Heroku environment variables, if detected
     if (System.getenv("PORT") != null) {
       Spark.port(Integer.parseInt(System.getenv("PORT")));
     }
@@ -49,7 +45,5 @@ public class App {
     Spark.get("/sightings/new", new SightingNewGetRoute(), new VelocityTemplateEngine());
     Spark.post("/sightings/new", new SightingNewPostRoute(), new VelocityTemplateEngine());
     Spark.get("/sightings/:id", new SightingViewGetRoute(), new VelocityTemplateEngine());
-
-    Spark.get("/error/:id", new ErrorGetRoute(), new VelocityTemplateEngine());
   }
 }
